@@ -11,6 +11,7 @@ httpx
 
 # Environment variables
 python-dotenv
+python-multipart
 
 # TTS
 gTTS
