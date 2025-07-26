@@ -1,9 +1,14 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
 aiohttp
 httpx
 python-dotenv
-elevenlabs
-emoji
+groq
 pydub
+emoji
+elevenlabs
+sqlite-utils
+openai
+loguru
+gtts
