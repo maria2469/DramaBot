@@ -26,7 +26,7 @@ const GenerateScript = ({ sessionId, setScriptText, setScriptAvailable }) => {
                 setScriptText("❌ Script generation failed. Please try again.");
                 setScriptAvailable(false);
             } else {
-                console.log("✅ Full script received:", script.slice(0, 500)); // preview
+                console.log("✅ Full script received:", script.slice(0, 500));
                 setScriptText(script);
                 setScriptAvailable(true);
             }
@@ -41,14 +41,16 @@ const GenerateScript = ({ sessionId, setScriptText, setScriptAvailable }) => {
     };
 
     return (
-        <div className="my-4 text-center">
-            <button
-                onClick={handleGenerate}
-                disabled={loading}
-                className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg shadow-md transition-all"
-            >
-                {loading ? "🎭 Generating Script..." : "📝 Generate Theatre Script"}
-            </button>
+        <div className="my-6 mx-auto max-w-xl p-6 bg-gradient-to-br from-[#1a002d] to-[#0d001a] shadow-lg rounded-3xl text-white">
+            <div className="text-center">
+                <button
+                    onClick={handleGenerate}
+                    disabled={loading}
+                    className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg shadow-md transition-all"
+                >
+                    {loading ? "🎭 Generating Script..." : "📝 Generate Theatre Script"}
+                </button>
+            </div>
         </div>
     );
 };

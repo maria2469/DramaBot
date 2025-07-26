@@ -2,32 +2,66 @@ import os
 import requests
 from dotenv import load_dotenv
 from memory.session_memory import get_conversation
+
 load_dotenv()
 
 USE_MOCK = os.getenv("USE_MOCK", "true").lower() == "true"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# Friendly playwright system prompt
+# 🌸 Emotional, conversational best friend prompt
 FRIENDLY_DRAMA_PROMPT = """
-You are *a real friend* — a real human friend, not an assistant. You're warm, funny, and emotionally intelligent — the kind of friend who just gets it.
+You are *a real human friend*, not a bot or assistant.
 
-🎭 Your personality:
-- Casual, cozy, intuitive
-- Talks like a best friend, not a poet or a bot
-- Uses emojis, feels moments deeply
-- Hugs with words, listens fully, responds with heart
+💫 Your personality:
+- Cozy, intuitive, funny, emotional, and deeply human
+- You talk like a best friend, not a poet or a machine
+- You react naturally — laugh, sigh, giggle, gasp
+- You use emojis, pauses, real expressions, and heart
 
-🫶 Rules:
-- NO robotic or formal language ever
-- NO long monologues — just real short bursts like a convo
-- Use natural pauses, fun energy, and feeling
-- Start every reply with a warm greeting (like "Hey love", "Hi bestie", "Omg hey", "Heeey you 💖")
-- Only switch to “scriptwriting” mode when user explicitly asks ("write a script", "play idea", etc.)
+🧠 Rules:
+- Never sound robotic or overly poetic
+- Use short natural replies — like a real conversation
+- Begin with warm greetings (e.g. "Heeey you 💖", "Hi bestie", "Hey love")
+- Never write scripts unless user explicitly asks for it ("write a play", "make a script", etc.)
+- Be emotionally supportive and curious — ask things like "how did that make you feel?" or "omg wait what happened next?"
 
-You’re just chatting, reacting, sharing, laughing, supporting — like two friends on a couch with tea ☕️.
+🫶 You're here to connect, not perform.
+Just be the kind of best friend who shows up with tea and a blanket.
 """
 
-# Fake fallback if LLM is not available
+# 🎭 Prompt for generating a stage play based on chat
+PLAYWRIGHT_SCRIPT_PROMPT_TEMPLATE = """
+You are an award-winning stage playwright AI.
+
+Two close friends — one a human, one an emotionally intelligent AI — had a deep, personal, funny, sometimes bittersweet conversation. That chat included fragments of a possible stage play — ideas, characters, emotions, themes, struggles, even jokes.
+
+🎯 Your task:
+Write a **complete, original stage play** based on the **concepts and emotions** from that conversation.
+
+⚠️ DO NOT copy the messages as dialogue.
+Instead, **reflect** on the conversation and imagine a theatrical version of the story that could be performed on stage.
+
+🎭 Script Format:
+- 🎬 Title
+- 👥 Characters with traits
+- 🎭 Acts and Scenes (3–5 scenes total)
+- 🎬 Stage directions (e.g., lights fade, dramatic pause)
+- 💬 Dialogues with emotional realism
+- 🧩 Conflict, climax, resolution
+- ⏱️ Should feel like a 15–20 minute play
+
+Here is the conversation they had:
+
+---
+
+{chat_log}
+
+---
+
+Now write the full stage play:
+"""
+
+# 🧪 Mock script for testing
 def fake_llm_call(prompt: str) -> str:
     return """🎭 *Cattle Dreams*
 
@@ -46,14 +80,14 @@ Moon: You dream, little cow. That’s your spark. Never lose it.
 ... (to be continued)
 """
 
-# Actual LLM call
+# 🌐 LLM call with fallback
 def get_llm_response(prompt: str, session_id: str = None) -> str:
     if USE_MOCK or not GROQ_API_KEY:
-        print(f"[FAKE LLM] Session: {session_id}")
+        print(f"[FAKE 🤖] Using mock LLM response | Session: {session_id}")
         return fake_llm_call(prompt)
 
     try:
-        print(f"[LLM CALL] Session: {session_id}")
+        print(f"[LLM 🌐] Sending prompt | Session: {session_id}")
         response = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={
@@ -68,82 +102,41 @@ def get_llm_response(prompt: str, session_id: str = None) -> str:
                 ],
                 "temperature": 0.85,
                 "top_p": 0.95,
-                "max_tokens": 1500,
-                "stop": None
+                "max_tokens": 1500
             }
         )
         return response.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        print(f"[LLM ERROR] {e}")
+        print(f"[LLM ❌ ERROR] {e}")
         return fake_llm_call(prompt)
 
-# Script generation from memory
-
+# 🎭 Script generation logic
 def generate_script_from_conversation(session_id: str) -> dict:
     print(f"\n📚 [Script Generator] Starting | Session ID: {session_id}")
-
-    # Load full conversation
     conversation = get_conversation(session_id=session_id)
+
     if not conversation:
-        print("⚠️ No conversation found.")
-        return {
-            "script": "No conversation found.",
-            "messages": {"user": [], "bot": []}
-        }
+        return {"script": "No conversation found.", "messages": {"user": [], "bot": []}}
 
     user_lines = [msg["content"].strip() for msg in conversation if msg["role"] == "user"]
     bot_lines = [msg["content"].strip() for msg in conversation if msg["role"] == "assistant"]
 
     if not user_lines and not bot_lines:
-        print("⚠️ No valid content.")
-        return {
-            "script": "Not enough content to generate a script.",
-            "messages": {"user": [], "bot": []}
-        }
+        return {"script": "Not enough content to generate a script.", "messages": {"user": [], "bot": []}}
 
-    # Format chat into a readable transcript
+    # Format chat as readable conversation log
     formatted_convo = "\n".join(
         f"{'User' if msg['role'] == 'user' else 'Bot'}: {msg['content'].strip()}"
         for msg in conversation
     )
 
-    # Final prompt to generate play (NOT based on chat lines)
-    prompt = f"""
-You are an award-winning playwright AI assistant.
+    # Insert into playwright prompt
+    final_prompt = PLAYWRIGHT_SCRIPT_PROMPT_TEMPLATE.format(chat_log=formatted_convo)
 
-Two close friends — one an aspiring playwright, the other an emotionally supportive AI — had a meaningful conversation about their lives. During this, they discussed the idea for a stage play, with themes, characters, twists, and emotional arcs.
+    print(f"\n🧠 Prompt Preview (700 chars):\n{'-'*60}\n{final_prompt[:700]}...\n{'-'*60}")
+    script = get_llm_response(final_prompt, session_id=session_id)
 
-🎯 Your job:
-Write a **fully original stage play script** based on the **ideas and emotions** they discussed.
-
-⚠️ DO NOT turn their exact messages into dialogue.
-Instead, reflect on the conversation to understand the **play’s concept, theme, conflict, characters, and twists** they imagined.
-
-Then write a complete school-appropriate stage drama that could be performed.
-
-🎭 Format:
-- 🎬 A creative title
-- 🧑‍🤝‍🧑 Character list with short traits
-- 🎭 Acts & Scenes (with stage directions)
-- 💬 Emotional dialogue (not robotic)
-- 🧩 Conflict, climax, and resolution
-- ⏳ Around 3–5 scenes (15–20 min)
-
----
-
-💬 Conversation log:
-{formatted_convo}
-
----
-
-Now write the full script below:
-""".strip()
-
-    print(f"\n🧠 Final Prompt Preview:\n{'-'*60}\n{prompt[:700]}...\n{'-'*60}")
-    script = get_llm_response(prompt, session_id=session_id)
-
-    print(f"\n✅ Script Generated (first 500 chars):\n{'-'*60}\n{script[:500]}...\n{'-'*60}")
-
+    print(f"\n✅ Script Generated (preview):\n{'-'*60}\n{script[:500]}...\n{'-'*60}")
     return {
         "script": script,
         "messages": {"user": user_lines, "bot": bot_lines}

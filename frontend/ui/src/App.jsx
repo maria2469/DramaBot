@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Header from './components/Header';
 import Conversation from './components/Conversation';
 import Instructions from './components/Instructions';
@@ -25,6 +25,13 @@ const App = () => {
     console.log('📌 Reusing existing Session ID:', sessionRef.current);
   }
   const sessionId = sessionRef.current;
+
+  useEffect(() => {
+    document.body.style.overflow = started ? 'auto' : 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [started]);
 
   const downloadScript = () => {
     if (!scriptText) return;
@@ -53,77 +60,75 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen w-full text-white flex flex-col bg-black">
-      {/* 🌄 Header with 3D Animation */}
-      <div className="relative w-full h-[50vh] overflow-hidden">
-        <iframe
-          src="https://my.spline.design/lostorbinthemountains-wnWOlt4g3IL2NMcmBdIw4gZX/"
-          frameBorder="0"
-          width="100%"
-          height="100%"
-          className="absolute top-0 left-0 w-full h-full z-0"
-          title="3D Hero Animation"
+    <div className="relative min-h-screen w-full text-white overflow-x-hidden">
+      {/* 🎨 3D Background */}
+      <iframe
+        src="https://my.spline.design/particleswithcolorshiftbackground-zTb4huISTDkFlWHn45oX068O/"
+        className="fixed top-0 left-0 w-full h-full z-0"
+        frameBorder="0"
+        title="Animated Background"
+      ></iframe>
+
+      {/* 🌌 Foreground Content */}
+      <div className="relative z-10 min-h-screen w-full">
+        <Header
+          isMuted={isMuted}
+          setIsMuted={setIsMuted}
+          scriptAvailable={scriptAvailable}
+          downloadScript={downloadScript}
+          clearConversation={clearConversation}
         />
-        <div className="absolute top-0 left-0 w-full h-full z-10 bg-black/30 flex items-center justify-center">
-          <Header
-            isMuted={isMuted}
-            setIsMuted={setIsMuted}
-            scriptAvailable={scriptAvailable}
-            downloadScript={downloadScript}
-            clearConversation={clearConversation}
-          />
-        </div>
-      </div>
 
-      {/* 📜 Main Content */}
-      <div className="flex-grow max-w-6xl mx-auto px-6 py-10 flex flex-col gap-10">
-        {playbills.length > 0 && (
-          <section className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-lg">
-            <h3 className="text-2xl font-bold text-pink-300 mb-4">🎭 Your Past Plays</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {playbills.map((pb, idx) => (
-                <PlaybillCard key={idx} {...pb} />
-              ))}
-            </div>
+        <main className="flex-grow max-w-6xl mx-auto px-6 py-10 flex flex-col gap-10">
+          {playbills.length > 0 && (
+            <section className="rounded-2xl p-6 border border-white/20 shadow-lg bg-transparent">
+              <h3 className="text-2xl font-bold text-pink-300 mb-4">🎭 Your Past Plays</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {playbills.map((pb, idx) => (
+                  <PlaybillCard key={idx} {...pb} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className="rounded-3xl p-6 shadow-lg text-white bg-gradient-to-br from-[#1a002d] to-[#0d001a] border border-white/10">
+            <h3 className="text-xl font-semibold text-purple-200 mb-2">🗣️ Ongoing Conversation</h3>
+            <Conversation conversation={conversation} />
+            <VoiceInteraction
+              isMuted={isMuted}
+              addMessage={addMessageToConversation}
+              sessionId={sessionId}
+            />
           </section>
-        )}
 
-        <section className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-inner">
-          <h3 className="text-xl font-semibold text-purple-200 mb-2">🗣️ Ongoing Conversation</h3>
-          <Conversation conversation={conversation} />
-          <VoiceInteraction
-            isMuted={isMuted}
-            addMessage={addMessageToConversation}
-            sessionId={sessionId}
-          />
-        </section>
-
-        <section className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-inner">
-          <GenerateScript
-            sessionId={sessionId}
-            setScriptText={setScriptText}
-            setScriptAvailable={setScriptAvailable}
-          />
-        </section>
-
-        {scriptAvailable && scriptText && (
-          <section className="bg-white/10 border border-white/20 rounded-2xl p-6 shadow-lg">
-            <h3 className="text-2xl font-bold text-indigo-300 mb-4">🎬 Generated Script</h3>
-            <div className="max-h-96 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed p-4 bg-black/30 rounded-lg text-purple-100 font-mono">
-              <pre>{scriptText}</pre>
-            </div>
-            <button
-              onClick={downloadScript}
-              className="mt-4 bg-indigo-600 hover:bg-indigo-700 transition px-5 py-2 rounded-xl text-white font-semibold shadow-md"
-            >
-              ⬇️ Download Script
-            </button>
+          <section className="rounded-2xl border border-white/10 p-6 shadow-inner bg-transparent">
+            <GenerateScript
+              sessionId={sessionId}
+              setScriptText={setScriptText}
+              setScriptAvailable={setScriptAvailable}
+            />
           </section>
-        )}
 
-        <section className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 shadow-inner">
-          <Instructions />
-        </section>
+          {scriptAvailable && scriptText && (
+            <section className="border border-white/20 rounded-2xl p-6 shadow-lg bg-transparent">
+              <h3 className="text-2xl font-bold text-black mb-4">🎬 Generated Script</h3>
+              <div className="max-h-96 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed p-4 rounded-lg text-purple-100 font-mono bg-black">
+                <pre>{scriptText}</pre>
+              </div>
+              <button
+                onClick={downloadScript}
+                className="mt-4 relative group bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 hover:from-pink-700 hover:to-purple-700 transition-all duration-300 px-6 py-3 rounded-xl text-white font-bold shadow-lg"
+              >
+                <span className="relative z-10">⬇️ Download Script</span>
+                <span className="absolute inset-0 rounded-xl opacity-50 group-hover:opacity-80 blur-lg bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 transition duration-500 animate-pulse"></span>
+              </button>
+            </section>
+          )}
+
+          <section className="rounded-xl border border-white/10 p-6 shadow-inner bg-transparent">
+            <Instructions />
+          </section>
+        </main>
       </div>
     </div>
   );

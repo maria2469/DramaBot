@@ -18,7 +18,7 @@ STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
 # Cache for repeat generation (basic memory)
 AUDIO_CACHE = {}
-def split_text_into_chunks(text: str, max_len: int = 450) -> list:
+def split_text_into_chunks(text: str, max_len: int = 1000) -> list:
     """Split text into chunks that gTTS can handle."""
     sentences = re.split(r'(?<=[.?!])\s+', text)
     chunks = []

@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+/* Prevent scrolling when app hasn't started */
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+}
