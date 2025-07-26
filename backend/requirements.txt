@@ -1,10 +1,35 @@
+# Web framework
 fastapi
 uvicorn
+
+# Data validation
 pydantic
+
+# Async HTTP clients
 aiohttp
 httpx
+
+# Environment variables
 python-dotenv
+
+# TTS
+gTTS
 elevenlabs
-emoji
-groq
+
+# Audio processing
 pydub
+
+# Emojis in text
+emoji
+
+# LLM integration (Groq or similar)
+groq
+
+# Optional: if you use OpenAI too
+openai
+
+
+
+
+# Logging (optional but helpful)
+loguru
