@@ -91,7 +91,7 @@ Moon: You dream, little cow. That’s your spark. Never lose it.
 # 🌐 LLM call with fallback
 def get_llm_response(prompt: str, session_id: str = None) -> str:
     if USE_MOCK or not GROQ_API_KEY:
-        print(f"[FAKE 🤖] Using mock LLM response | Session: {session_id}")
+        
         return fake_llm_call(prompt)
 
     try:
@@ -115,12 +115,12 @@ def get_llm_response(prompt: str, session_id: str = None) -> str:
         )
         return response.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        print(f"[LLM ❌ ERROR] {e}")
+        
         return fake_llm_call(prompt)
 
 # 🎭 Script generation logic
 def generate_script_from_conversation(session_id: str) -> dict:
-    print(f"\n📚 [Script Generator] Starting | Session ID: {session_id}")
+    
     conversation = get_conversation(session_id=session_id)
 
     if not conversation:
@@ -141,10 +141,10 @@ def generate_script_from_conversation(session_id: str) -> dict:
     # Insert into playwright prompt
     final_prompt = PLAYWRIGHT_SCRIPT_PROMPT_TEMPLATE.format(chat_log=formatted_convo)
 
-    print(f"\n🧠 Prompt Preview (700 chars):\n{'-'*60}\n{final_prompt[:700]}...\n{'-'*60}")
+    
     script = get_llm_response(final_prompt, session_id=session_id)
 
-    print(f"\n✅ Script Generated (preview):\n{'-'*60}\n{script[:500]}...\n{'-'*60}")
+    
     return {
         "script": script,
         "messages": {"user": user_lines, "bot": bot_lines}

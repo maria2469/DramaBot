@@ -16,7 +16,7 @@ def generate_script(payload: dict):
 
     script = generate_script_from_conversation(messages, session_id=session_id)
 
-    print("✅ Generated script from full voice interaction:")
-    print(script)
+    
+    
 
     return {"success": True, "script": script, "session_id": session_id}

@@ -13,7 +13,7 @@ def speak_text(text, voice="Rachel", output_path="output.wav"):
             stream=False
         )
         save(audio, output_path)
-        print(f"✅ Voice generated and saved at: {output_path}")
+        
         return output_path
     except Exception as e:
         print(f"❌ Error in TTS: {e}")

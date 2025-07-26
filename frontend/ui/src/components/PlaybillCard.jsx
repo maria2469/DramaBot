@@ -1,29 +1,30 @@
 // src/components/PlaybillCard.jsx
-import React from "react";
-import { ArrowRight } from "lucide-react";
+import React from 'react';
+import { ArrowRight } from 'lucide-react';
 
-const PlaybillCard = ({ title, timestamp, mood, summary, onClick }) => {
+const PlaybillCard = ({ title, description, date, genre, onClick }) => {
     return (
         <div
             onClick={onClick}
-            className="p-4 rounded-2xl shadow-md hover:shadow-xl transition-shadow cursor-pointer bg-white/80 backdrop-blur-sm border border-neutral-200"
+            className="bg-gradient-to-br from-purple-800 via-fuchsia-900 to-black border border-white/10 rounded-2xl shadow-lg p-5 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
         >
-            <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-semibold text-neutral-800 truncate max-w-[70%]">
-                        {title || "Untitled Story"}
-                    </h2>
-                    <span className="text-xs border border-neutral-400 text-neutral-700 px-2 py-0.5 rounded-full">
-                        {mood || "✨ Emotional"}
-                    </span>
-                </div>
-                <p className="text-sm text-neutral-600 line-clamp-2">
-                    {summary || "A human-AI co-written story. Click to revisit the vibes."}
-                </p>
-                <div className="flex justify-between items-center pt-2 text-xs text-neutral-500">
-                    <span>{timestamp || "Just now"}</span>
-                    <ArrowRight className="w-4 h-4" />
-                </div>
+            <h4 className="text-xl font-bold text-pink-300 mb-2">
+                {title || 'Untitled Play'}
+            </h4>
+
+            <p className="text-sm text-purple-100 mb-4 whitespace-pre-line">
+                {description || 'No description available.'}
+            </p>
+
+            <div className="flex justify-between items-center text-xs text-purple-400">
+                <span>{date || 'Unknown Date'}</span>
+                <span className="bg-pink-700/30 px-2 py-1 rounded-md">
+                    {genre || 'Drama'}
+                </span>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+                <ArrowRight className="w-4 h-4 text-pink-300" />
             </div>
         </div>
     );

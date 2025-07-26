@@ -56,13 +56,13 @@ class GenerateScriptRequest(BaseModel):
 async def attach_session_memory(request: Request, call_next):
     session_id = request.query_params.get("session_id") or request.headers.get("X-Session-ID")
     if session_id:
-        print(f"🔍 Middleware: Calling get_conversation for session_id={session_id}")
+        
         memory = session_memory.get_conversation(session_id)
-        print(f"✅ Middleware: Retrieved memory (len={len(memory)})")
+        
         request.state.session_id = session_id
         request.state.session_memory = memory
     else:
-        print("⚠️ Middleware: No session_id found.")
+        
         request.state.session_memory = None
         request.state.session_id = None
 
@@ -74,30 +74,30 @@ async def attach_session_memory(request: Request, call_next):
 # === Voice Input Endpoint ===
 @app.post("/voice/interact")
 async def voice_interact(file: UploadFile = File(...), session_id: str = Form(...)):
-    print(f"🎤 /voice/interact | Session ID: {session_id}")
+    
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
             shutil.copyfileobj(file.file, temp_audio)
             temp_path = temp_audio.name
-            print(f"🎧 Saved audio to: {temp_path}")
+            
 
-        # Process the audio
+        # Process the audio and get results
         result = await process_voice_interaction(temp_path, session_id)
 
-        user_text = result.get("user_text", "").strip()
-        bot_response = result.get("bot_response", "").strip()
+        user_text = result.get("transcript", "").strip()
+        bot_response = result.get("ai_response", "").strip()
 
         if user_text:
-            print(f"📝 Calling add_to_memory (user): {user_text}")
+            
             add_to_memory(session_id, "user", user_text)
         if bot_response:
-            print(f"🎭 Calling add_to_memory (bot): {bot_response}")
+            
             add_to_memory(session_id, "bot", bot_response)
 
-        print("📦 Calling dump_memory after interaction:")
+        
         dump_memory(session_id)
 
-        print("📊 Calling get_memory_stats")
+        
         stats = get_memory_stats(session_id)
         print(f"Memory Stats: {stats}")
 
@@ -107,13 +107,31 @@ async def voice_interact(file: UploadFile = File(...), session_id: str = Form(..
         raise HTTPException(status_code=500, detail="Voice interaction failed.")
 
 
+
 # === Text-to-Speech Endpoint ===
 @app.post("/voice/tts")
 async def tts_endpoint(payload: TTSRequest):
-    print(f"🔊 /voice/tts | Session: {payload.session_id} | Text: {payload.text[:50]}...")
+    
     try:
         result = await process_text_to_speech(payload.text, payload.session_id)
-        return result
+
+        # Extract and log the emotional score
+        emotional = result.get("emotional_score", {})
+        score = emotional.get("score")
+        intensity = emotional.get("intensity")
+        connection = emotional.get("connection")
+        response_time = emotional.get("response_time")
+
+        if score is not None:
+            print(f"📈 Emotional Score: {score} | Intensity: {intensity} | Connection: {connection} | Response Time: {response_time:.2f}")
+        else:
+            print(f"⚠️ No emotional score returned for session: {payload.session_id}")
+
+        return JSONResponse(content={
+            "audio_url": result["audio_url"],
+            "emotional_score": emotional
+        })
+
     except Exception as e:
         print(f"❌ TTS failed: {e}")
         raise HTTPException(status_code=500, detail="Text-to-speech failed.")
@@ -166,20 +184,9 @@ def get_conversation_debug(session_id: str):
     }
 
 
-@app.get("/debug/memory")
-def get_all_memory_stats():
-    try:
-        print("🧠 Debug: Calling get_memory_stats")
-        stats = get_memory_stats()
-        return stats
-    except Exception as e:
-        print(f"❌ Memory stats error: {e}")
-        return JSONResponse(status_code=500, content={"error": str(e)})
 
-# === Health Check ===
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
+
+
 
 # === Root Info ===
 @app.get("/")

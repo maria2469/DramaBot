@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-// 🌐 Replace with your deployed backend URL
-const API_BASE = 'https://dramabot-production-c295.up.railway.app';
+// 🌐 Automatically switch between local and deployed backend
+const API_BASE =
+    window.location.hostname === 'localhost'
+        ? 'http://localhost:8000'
+        : 'https://dramabot-production-c295.up.railway.app';
 
 const GenerateScript = ({ sessionId, setScriptText, setScriptAvailable }) => {
     const [loading, setLoading] = useState(false);
 
     const handleGenerate = async () => {
         if (!sessionId) {
-            console.error("❌ Session ID missing. Cannot generate script.");
+            
             return;
         }
 
@@ -23,17 +26,17 @@ const GenerateScript = ({ sessionId, setScriptText, setScriptAvailable }) => {
             const { script, error } = res.data;
 
             if (error || !script) {
-                console.error("❌ Script generation failed or returned empty:", error);
+                
                 setScriptText("❌ Script generation failed. Please try again.");
                 setScriptAvailable(false);
             } else {
-                console.log("✅ Full script received:", script.slice(0, 500));
+                
                 setScriptText(script);
                 setScriptAvailable(true);
             }
 
         } catch (err) {
-            console.error("❌ API error during script generation:", err);
+            
             setScriptText("❌ Error generating script.");
             setScriptAvailable(false);
         } finally {
