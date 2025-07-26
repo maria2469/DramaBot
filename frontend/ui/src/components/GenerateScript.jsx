@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:8000';
+// 🌐 Replace with your deployed backend URL
+const API_BASE = 'https://dramabot-production-c295.up.railway.app';
 
 const GenerateScript = ({ sessionId, setScriptText, setScriptAvailable }) => {
     const [loading, setLoading] = useState(false);

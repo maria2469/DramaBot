@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
-const API_BASE = "http://localhost:8000";
+// ✅ Use deployed Railway API
+const API_BASE = "https://dramabot-production-c295.up.railway.app";
 
 const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId }) => {
     const [isRecording, setIsRecording] = useState(false);
@@ -10,7 +11,6 @@ const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId }) => {
     const mediaRecorderRef = useRef(null);
     const chunksRef = useRef([]);
 
-    // 🎭 Trigger story generation mode from user prompt
     const triggerStoryMode = (transcript) => {
         if (!transcript || typeof transcript !== "string") return;
         const lower = transcript.toLowerCase();
@@ -20,7 +20,6 @@ const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId }) => {
         }
     };
 
-    // 🎤 Toggle recording state
     const toggleRecording = async () => {
         if (!sessionId) {
             console.error("❌ No session ID — cannot record.");
