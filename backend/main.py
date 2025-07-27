@@ -32,7 +32,7 @@ app = FastAPI(title="🎭 Theatrical Drama Bot", version="1.0.0")
 # === CORS Setup ===
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Frontend origin
+    allow_origins=["https://drama-queen.vercel.app/"],  # Frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
