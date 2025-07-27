@@ -1,6 +1,5 @@
-// components/DramaJuiceMeter.jsx
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 const getJuiceLevel = (score) => {
     if (score >= 7) return { level: 'overflowing', icon: '🔥', color: 'bg-red-500' };
@@ -10,16 +9,24 @@ const getJuiceLevel = (score) => {
 
 const DramaJuiceMeter = ({ score = 0 }) => {
     const { level, icon, color } = getJuiceLevel(score);
-    const fillHeight = Math.min(10, score); // Clamp to 100%
+    const fillHeight = Math.min(10, score); // clamp to 10% for height usage
+
+    // Optional: Scroll effect (translateY)
+    const { scrollY } = useScroll();
+    const y = useTransform(scrollY, [0, 300], [0, -20]);
 
     return (
-        <div className="flex flex-col items-center gap-2 mt-4">
-            <div className="text-xl font-bold text-black">🧪 DRAMA JUICE</div>
+        <motion.div
+            className="flex flex-col items-center gap-2 mt-4"
+            style={{ y }} // scroll parallax
+        >
+            <div className="text-xl font-bold text-purple-200">🧪 DRAMA JUICE</div>
+
             <div className="relative w-14 h-40 border-4 border-purple-700 rounded-b-full overflow-hidden bg-gray-100">
                 <motion.div
                     className={`absolute bottom-0 w-full ${color}`}
-                    style={{ height: `${fillHeight}%` }}
-                    animate={{ height: `${fillHeight}%` }}
+                    style={{ height: `${fillHeight * 10}%` }}
+                    animate={{ height: `${fillHeight * 10}%` }}
                     transition={{ duration: 0.6 }}
                 />
                 {icon && (
@@ -33,10 +40,11 @@ const DramaJuiceMeter = ({ score = 0 }) => {
                     </motion.div>
                 )}
             </div>
-            <div className="text-sm text-black">
+
+            <div className="text-sm text-purple-200">
                 {level.toUpperCase()} — {score}/10
             </div>
-        </div>
+        </motion.div>
     );
 };
 

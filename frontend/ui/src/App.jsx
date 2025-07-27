@@ -121,25 +121,35 @@ const App = () => {
             </section>
           )}
 
-          {/* 🗣️ Conversation Area + Floating Meter */}
-          <div className="relative">
-            {/* 🎛️ Drama Juice Meter - floating to the right of conversation box */}
-            <div className="absolute -top-4 right-0 translate-x-full z-20">
-              <DramaJuiceMeter score={latestEmotionScore} />
+          {/* 🗣️ Conversation Area + Juice Meter Inside Scrollable Layout */}
+          <section className="rounded-3xl p-6 shadow-lg text-white bg-gradient-to-br from-[#1a002d] to-[#0d001a] border border-white/10">
+            <h3 className="text-xl font-semibold text-purple-200 mb-4">🗣️ Ongoing Conversation</h3>
+
+            {/* Conversation + Drama Meter side-by-side */}
+            <div className="flex flex-col lg:flex-row gap-6 max-h-[500px] overflow-y-auto pr-2">
+
+              {/* 🧪 Drama Juice Meter - sticky inside scroll area */}
+              <div className="lg:w-1/4 w-full sticky top-0 z-10">
+                <DramaJuiceMeter score={latestEmotionScore} />
+              </div>
+
+              {/* 💬 Scrollable Conversation */}
+              <div className="lg:w-3/4 w-full space-y-4">
+                <Conversation conversation={conversation} />
+              </div>
             </div>
 
-            {/* 🗣️ Conversation + Voice */}
-            <section className="rounded-3xl p-6 shadow-lg text-white bg-gradient-to-br from-[#1a002d] to-[#0d001a] border border-white/10">
-              <h3 className="text-xl font-semibold text-purple-200 mb-2">🗣️ Ongoing Conversation</h3>
-              <Conversation conversation={conversation} />
+            {/* 🎤 Voice Interaction - below conversation */}
+            <div className="mt-6">
               <VoiceInteraction
                 addMessage={addMessageToConversation}
                 sessionId={sessionId}
                 setStoryMode={setStoryMode}
                 setIntensityScore={setLatestEmotionScore}
               />
-            </section>
-          </div>
+            </div>
+          </section>
+
 
 
           {/* 🎬 Generate Script */}
