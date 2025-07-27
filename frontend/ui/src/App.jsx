@@ -7,6 +7,7 @@ import PlaybillCard from './components/PlayBillCard';
 import GenerateScript from './components/GenerateScript';
 import Landing from './components/Landing';
 import DramaJuiceMeter from './components/DramaJuiceMeter';
+
 import './App.css';
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
   const [conversation, setConversation] = useState([]);
   const [playbills, setPlaybills] = useState([]);
   const [started, setStarted] = useState(false);
+  const [storyMode, setStoryMode] = useState(false);
   const [latestEmotionScore, setLatestEmotionScore] = useState(0);
 
   const sessionRef = useRef(crypto.randomUUID());
@@ -133,6 +135,7 @@ const App = () => {
               <VoiceInteraction
                 addMessage={addMessageToConversation}
                 sessionId={sessionId}
+                setStoryMode={setStoryMode}
                 setIntensityScore={setLatestEmotionScore}
               />
             </section>

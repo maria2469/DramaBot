@@ -13,7 +13,7 @@ const Landing = ({ onStart }) => {
                     transition={{ duration: 1 }}
                 >
                     <h1 className="text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-white drop-shadow-lg">
-                        🎭 Drama Bot
+                        🎭 Drama Queen
                     </h1>
                     <p className="mt-4 text-xl md:text-2xl text-cyan-100 italic">
                         Unhinged. Emotional. Full of theatre.

@@ -1,9 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 
-const LOCAL_API = "http://localhost:8000";
-const PROD_API = "https://dramabot-production-c295.up.railway.app";
-const API_BASE = window.location.hostname === "localhost" ? LOCAL_API : PROD_API;
+const API_BASE = "https://dramabot-production-c295.up.railway.app";
 
 const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId, setIntensityScore }) => {
     const [isRecording, setIsRecording] = useState(false);
@@ -12,20 +10,16 @@ const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId, setInt
     const mediaRecorderRef = useRef(null);
     const chunksRef = useRef([]);
 
-  
-
     const triggerStoryMode = (transcript) => {
         if (!transcript || typeof transcript !== "string") return;
         const lower = transcript.toLowerCase();
         if (lower.includes("write") && (lower.includes("script") || lower.includes("play") || lower.includes("scene"))) {
-            
             setStoryMode(true);
         }
     };
 
     const toggleRecording = async () => {
         if (!sessionId) {
-            
             addMessage?.({
                 type: "error",
                 content: "No session ID found.",
@@ -35,44 +29,33 @@ const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId, setInt
         }
 
         if (isRecording) {
-            
             setIsRecording(false);
-            if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+            if (mediaRecorderRef.current?.state !== "inactive") {
                 mediaRecorderRef.current.stop();
             }
         } else {
-            console.log("🎙️ Starting recording...");
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const mediaRecorder = new MediaRecorder(stream);
                 chunksRef.current = [];
 
                 mediaRecorder.ondataavailable = (e) => {
-                    if (e.data.size > 0) {
-                        
-                        chunksRef.current.push(e.data);
-                    }
+                    if (e.data.size > 0) chunksRef.current.push(e.data);
                 };
 
                 mediaRecorder.onstop = async () => {
-                    
                     const blob = new Blob(chunksRef.current, { type: "audio/mp3" });
-                    
-
                     const formData = new FormData();
                     formData.append("file", blob, "input.mp3");
                     formData.append("session_id", sessionId);
                     setIsProcessing(true);
 
                     try {
-                        
                         const res = await axios.post(`${API_BASE}/voice/interact`, formData, {
                             headers: { "Content-Type": "multipart/form-data" },
                         });
 
                         const { transcript, ai_response, audio_url, timestamp, emotional_score } = res.data;
-
-                        
 
                         addMessage?.({ type: "user", content: transcript, timestamp });
                         addMessage?.({
@@ -83,16 +66,7 @@ const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId, setInt
                             intensity: emotional_score?.score || 0,
                         });
 
-                        if (setIntensityScore) {
-                            const score = emotional_score?.score;
-                            if (typeof score === "number") {
-                                
-                                setIntensityScore(score);
-                            } else {
-                                console.warn("⚠️ Emotional score is not a number:", score);
-                            }
-                        }
-
+                        setIntensityScore?.(Number(emotional_score?.score) || 0);
                         triggerStoryMode(transcript);
 
                         if (currentAudio) {
@@ -107,7 +81,7 @@ const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId, setInt
                         }
 
                     } catch (err) {
-                        
+                        console.error("❌ Voice processing failed:", err);
                         addMessage?.({
                             type: "error",
                             content: "Failed to process audio.",
@@ -121,12 +95,12 @@ const VoiceInteraction = ({ isMuted, addMessage, setStoryMode, sessionId, setInt
                 mediaRecorderRef.current = mediaRecorder;
                 mediaRecorder.start();
                 setIsRecording(true);
-                
+
             } catch (err) {
-                
+                console.error("🎙️ Microphone access error:", err);
                 addMessage?.({
                     type: "error",
-                    content: "Microphone access denied.",
+                    content: "Microphone access denied or unavailable.",
                     timestamp: new Date().toLocaleTimeString(),
                 });
             }
