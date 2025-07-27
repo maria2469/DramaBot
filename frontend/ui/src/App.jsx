@@ -3,7 +3,7 @@ import Header from './components/Header';
 import Conversation from './components/Conversation';
 import Instructions from './components/Instructions';
 import VoiceInteraction from './components/VoiceInteraction';
-import PlaybillCard from './components/PlayBillCard';
+import PlaybillCard from './components/PlaybillCard';
 import GenerateScript from './components/GenerateScript';
 import Landing from './components/Landing';
 import DramaJuiceMeter from './components/DramaJuiceMeter';
